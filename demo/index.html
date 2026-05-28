@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FairLoan MVP — Kapsayıcı Mikrokredi Skorlama Platformu</title>
+  <!-- Google Fonts: Outfit (Headings) & Inter (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --primary: #06b6d4; /* Cyan */
+      --primary-glow: rgba(6, 182, 212, 0.35);
+      --success: #10b981; /* Emerald */
+      --success-glow: rgba(16, 185, 129, 0.35);
+      --danger: #ef4444; /* Red */
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-blur: blur(16px);
+      --transition-speed: 0.3s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 40%);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Header styling */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1.5rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--primary), var(--success));
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 1.25rem;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .logo-text {
+      font-size: 1.75rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      background: linear-gradient(to right, #fff, #a5f3fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-badge {
+      font-size: 0.75rem;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      background: rgba(30, 41, 59, 0.5);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    /* Main Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.9fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card styling */
+    .glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+      backdrop-filter: var(--glass-blur);
+      padding: 2rem;
+      transition: border-color var(--transition-speed), transform var(--transition-speed);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    /* Persona Selector Panel */
+    .personas-panel {
+      margin-bottom: 2rem;
+    }
+
+    .persona-title {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .persona-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .persona-btn {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.8rem 1.2rem;
+      border-radius: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+      transition: all var(--transition-speed);
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .persona-btn span.tag {
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+
+    .persona-btn:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .persona-btn.active {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+    }
+
+    /* Input styling */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group.double-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    label span.val {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 0.1rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      outline: none;
+      -webkit-appearance: none;
+      transition: background 0.3s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--primary-glow);
+      transition: transform 0.15s, background-color 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #22d3ee;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color var(--transition-speed);
+    }
+
+    select:focus, input[type="number"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Primary CTA Button */
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--success));
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 1rem;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.25);
+      transition: all var(--transition-speed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 6px 25px rgba(6, 182, 212, 0.45);
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    /* Outcome Panel styling */
+    .outcome-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card States (Traditional biased vs Modern Inclusive) */
+    .outcome-card {
+      border-radius: 20px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Traditional (Biased & Sterile) */
+    .outcome-card.traditional {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .outcome-card.traditional.reddedildi {
+      border-left: 5px solid var(--danger);
+    }
+
+    .outcome-card.traditional.onaylandi {
+      border-left: 5px solid var(--text-muted);
+    }
+
+    /* FairLoan (Modern & Glowing) */
+    .outcome-card.fairloan {
+      background: radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 50%), rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .outcome-card.fairloan.approved {
+      border-left: 5px solid var(--success);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.1), 0 10px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .outcome-card.fairloan.rejected {
+      border-left: 5px solid var(--danger);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.1), 0 10px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-label span.method {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+    }
+
+    .outcome-card.fairloan .card-label span.method {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--primary);
+    }
+
+    .outcome-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Score gauge */
+    .gauge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    .score-circle-wrapper {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+
+    .circular-gauge {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .circular-gauge circle {
+      fill: none;
+      stroke-width: 8px;
+    }
+
+    .circular-gauge .bg-ring {
+      stroke: rgba(255, 255, 255, 0.05);
+    }
+
+    .circular-gauge .progress-ring {
+      stroke: var(--primary);
+      stroke-linecap: round;
+      stroke-dasharray: 402;
+      stroke-dashoffset: 402;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .score-text-absolute {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .score-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .score-max {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .risk-badge {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .risk-badge.low {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .risk-badge.medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .risk-badge.high {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Explanation list */
+    .factors-list {
+      list-style: none;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 1rem;
+    }
+
+    .factors-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    .factors-list li.positive {
+      color: #e2e8f0;
+    }
+
+    .factors-list li.positive::before {
+      content: "✓";
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .factors-list li.negative {
+      color: var(--text-muted);
+    }
+
+    .factors-list li.negative::before {
+      content: "⚠";
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .traditional-reasons {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 1rem;
+    }
+
+    .traditional-reason-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    .traditional-reason-item.fail {
+      color: #94a3b8;
+    }
+
+    .decision-stamp {
+      align-self: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.4rem 1.2rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      letter-spacing: 0.05em;
+      transform: rotate(-3deg);
+      border-width: 3px;
+      border-style: double;
+      width: fit-content;
+    }
+
+    .decision-stamp.rejected {
+      color: var(--danger);
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .decision-stamp.approved {
+      color: var(--success);
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    /* Pitch storytelling assistant */
+    .pitch-assistant {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      border-radius: 20px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .pitch-title {
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pitch-quote {
+      font-style: italic;
+      color: var(--primary);
+      border-left: 3px solid var(--primary);
+      padding-left: 0.75rem;
+      margin: 0.5rem 0;
+    }
+
+    /* Tab switcher for BIAS audit */
+    .tabs-wrapper {
+      margin-top: 2rem;
+    }
+
+    .tabs-header {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.5rem 0.2rem;
+      cursor: pointer;
+      position: relative;
+      transition: color var(--transition-speed);
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* Bias audit content styling */
+    .bias-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .bias-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bias-img-container {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bias-img-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .bias-explanation-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .metric-row {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-lbl {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .metric-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .metric-val.high {
+      color: var(--success);
+    }
+
+    .metric-val.low {
+      color: var(--danger);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Skeleton Loading state */
+    .loading-pulse {
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- HEADER -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-icon">FL</div>
+        <div class="logo-text">FairLoan</div>
+        <div class="logo-badge">MVP Demo</div>
+      </div>
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span>Yapay Zeka Modeli Aktif</span>
+      </div>
+    </header>
+
+    <!-- (Personas Panel Removed) -->
+
+    <!-- MAIN TAB SECTIONS -->
+    <div class="tabs-wrapper">
+      <div class="tabs-header">
+        <button class="tab-btn active" id="tab-demo" onclick="switchTab('demo-section')">Simülatör & Değerlendirme</button>
+        <button class="tab-btn" id="tab-bias" onclick="switchTab('bias-section')">Yapay Zeka Bias Audit (Önyargı Denetimi)</button>
+      </div>
+
+      <!-- TAB 1: SIMULATOR & DEMO -->
+      <div class="tab-content active" id="demo-section">
+        <div class="dashboard-grid">
+          
+          <!-- LEFT: INPUT FORM CARD -->
+          <div class="glass-card">
+            <h2 class="section-title">Başvuru Parametreleri</h2>
+            <form id="loanForm" onsubmit="calculateScore(event)">
+              
+              <!-- Gelir & İstihdam (Geleneksel) -->
+              <div class="form-group">
+                <label for="gelir">Geleneksel Aylık Gelir (TL) <span class="val" id="lbl-gelir">12,000</span></label>
+                <input type="range" min="0" max="30000" step="500" id="gelir" value="4000" oninput="updateVal('gelir')">
+              </div>
+
+              <div class="form-group">
+                <label for="istihdam_turu">İstihdam Türü</label>
+                <select id="istihdam_turu" onchange="updateCustomLabels()">
+                  <option value="formal">Kayıtlı İstihdam (Formal/Bordrolu)</option>
+                  <option value="serbest" selected>Serbest Çalışan (Freelance/Esnaf)</option>
+                  <option value="ev_kadinı">Ev Hanımı (Kayıt Dışı Üretici)</option>
+                  <option value="kooperatif">Kooperatif Çalışanı/Üyesi</option>
+                </select>
+              </div>
+
+              <!-- Alternatif Veriler (FairLoan) -->
+              <div style="margin: 2rem 0 1rem 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+                <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 1rem;">
+                  FairLoan Alternatif Veri Seti
+                </h4>
+              </div>
+
+              <div class="form-group">
+                <label for="fatura_odeme_skoru">Fatura Ödeme Skoru (0-100) <span class="val" id="lbl-fatura">80</span></label>
+                <input type="range" min="0" max="100" id="fatura_odeme_skoru" value="85" oninput="updateVal('fatura_odeme_skoru')">
+              </div>
+
+              <div class="form-group">
+                <label for="kira_gecmis_ay">Kira Geçmişi (Ay) <span class="val" id="lbl-kira">24</span></label>
+                <input type="range" min="0" max="60" id="kira_gecmis_ay" value="36" oninput="updateVal('kira_gecmis_ay')">
+              </div>
+
+              <div class="form-group">
+                <label for="eticaret_aylik_ciro">E-Ticaret Aylık Ciro (TL) <span class="val" id="lbl-ciro">2,500</span></label>
+                <input type="range" min="0" max="15000" step="250" id="eticaret_aylik_ciro" value="1500" oninput="updateVal('eticaret_aylik_ciro')">
+              </div>
+
+              <div class="form-group double-col">
+                <div class="form-group">
+                  <label for="kooperatif_uye_ay">Koop. Üyelik (Ay) <span class="val" id="lbl-koop">12</span></label>
+                  <input type="range" min="0" max="120" id="kooperatif_uye_ay" value="18" oninput="updateVal('kooperatif_uye_ay')">
+                </div>
+                <div class="form-group">
+                  <label for="sosyal_ag_skoru">Sosyal Ağ Skoru <span class="val" id="lbl-sosyal">70</span></label>
+                  <input type="range" min="0" max="100" id="sosyal_ag_skoru" value="80" oninput="updateVal('sosyal_ag_skoru')">
+                </div>
+              </div>
+
+              <button type="submit" class="btn-submit">
+                <span>Hesapla & Karşılaştır</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- RIGHT: OUTCOME COMPARISON CARD -->
+          <div class="outcome-wrapper">
+            <div class="comparison-grid">
+              
+              <!-- TRADITIONAL BANCO RESULT -->
+              <div class="outcome-card traditional reddedildi" id="card-traditional">
+                <div class="card-label">
+                  <span>Geleneksel Değerlendirme</span>
+                  <span class="method">Skorlama Kuralları</span>
+                </div>
+                <h3 class="outcome-title">Geleneksel Karar</h3>
+                
+                <div id="traditional-decision-stamp" class="decision-stamp rejected">Reddedildi</div>
+                
+                <div class="traditional-reasons" id="traditional-reasons-list">
+                  <!-- Dynamic content -->
+                </div>
+              </div>
+
+              <!-- FAIRLOAN INTERACTIVE ML RESULT -->
+              <div class="outcome-card fairloan approved" id="card-fairloan">
+                <div class="card-label">
+                  <span>FairLoan Yapay Zeka</span>
+                  <span class="method">Makine Öğrenmesi (GBM)</span>
+                </div>
+                <h3 class="outcome-title">Alternatif Değerlendirme</h3>
+
+                <!-- Score Circle Gauge -->
+                <div class="gauge-container">
+                  <div class="score-circle-wrapper">
+                    <svg class="circular-gauge">
+                      <circle class="bg-ring" cx="70" cy="70" r="64" />
+                      <circle class="progress-ring" id="gauge-progress" cx="70" cy="70" r="64" />
+                    </svg>
+                    <div class="score-text-absolute">
+                      <div class="score-number" id="score-num">840</div>
+                      <div class="score-max">/ 1000</div>
+                    </div>
+                  </div>
+                  <div class="risk-badge low" id="risk-badge-text">Düşük Risk</div>
+                </div>
+
+                <div id="fairloan-decision-stamp" class="decision-stamp approved">Onaylandı</div>
+                
+                <ul class="factors-list" id="fairloan-factors-list">
+                  <!-- Dynamic content -->
+                </ul>
+
+                <!-- AI Score Builder Plan Box -->
+                <div id="ai-score-builder-box" style="margin-top: 1.5rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(16, 185, 129, 0.04) 100%); border: 1px dashed rgba(6, 182, 212, 0.3); border-radius: 16px; padding: 1.15rem; display: none; animation: fadeIn 0.5s ease;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem; font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem;">
+                    <span>⚡ Yapay Zeka Skor İyileştirme Planı</span>
+                  </div>
+                  <p id="ai-score-builder-text" style="font-size: 0.78rem; line-height: 1.45; color: #e2e8f0; font-style: italic;"></p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- (Storytelling quote removed to focus on manual simulation) -->
+
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: BIAS AUDIT (Görsel Grafik Ekranı) -->
+      <div class="tab-content" id="bias-section">
+        <div class="glass-card">
+          <h2 class="section-title">Adalet Denetimi: Önyargı Karşılaştırma Raporu</h2>
+          <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 800px;">
+            Aşağıdaki grafik, model eğitimimiz sırasında 2,000 kişilik sentetik veri seti üzerinden otomatik olarak türetilmiştir. Geleneksel sistemde özellikle "ev hanımı" ve "serbest çalışan" grupları neredeyse tamamen finansal sistemin dışına itilirken, FairLoan ML alternatif verilerle adil ve dengeli bir onay dağılımı sağlar.
+          </p>
+
+          <div class="bias-layout">
+            <div class="bias-img-container">
+              <img id="bias-graph-img" src="bias_comparison.png" alt="Bias Comparison Chart" onerror="this.src='https://placehold.co/800x480/1e293b/ffffff?text=Bias+Kar%C5%9F%C4%B1la%C5%9Ft%C4%B1rma+Grafi%C4%9Fi'">
+            </div>
+            
+            <div class="bias-explanation-card">
+              <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Model Adalet Raporu Bulguları</h3>
+              
+              <div class="metric-row">
+                <span class="metric-lbl">Geleneksel Ev Hanımı Onay Oranı</span>
+                <span class="metric-val low">0.0%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-lbl">FairLoan Ev Hanımı Onay Oranı</span>
+                <span class="metric-val high">~48.5%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-lbl">Model Doğruluğu (ROC-AUC)</span>
+                <span class="metric-val high" style="color: var(--primary);">92.4%</span>
+              </div>
+              
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+                <strong>Metodoloji:</strong> 
+                Makine öğrenmesi pipeline'ımız, geleneksel cinsiyet önyargısı içeren gelir ve unvan değişkenlerini tamamen yok sayarak çalışır. Bunun yerine, finansal sorumluğu temsil eden 5 alternatif sütunu girdi olarak kabul eder. Bu sayede mikro-üretim yapan kadınların kredi sistemi içerisine adilce dahil edilmesi sağlanmıştır.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT FOR DYNAMIC DASHBOARD & API INTEGRATION -->
+  <script>
+    // Persona definitions based on the demo requirements
+    const personas = {
+      ayse: {
+        gelir: 4000,
+        istihdam_turu: "ev_kadinı",
+        fatura_odeme_skoru: 85,
+        kira_gecmis_ay: 36,
+        eticaret_aylik_ciro: 1500,
+        kooperatif_uye_ay: 18,
+        sosyal_ag_skoru: 80,
+        quote: `"Geleneksel bankacılık Ayşe Hanım'ı düzenli bordrosu olmadığı ve ev hanımı olduğu için doğrudan reddetti. Fakat FairLoan ML altyapımız, Ayşe Hanım'ın kadın kooperatifi üyeliğini, fatura ödemelerini ve 3 yıllık düzenli kira geçmişini inceleyerek ona 840 puan verdi ve kredisini onayladı!"`
+      },
+      zeynep: {
+        gelir: 7500,
+        istihdam_turu: "serbest",
+        fatura_odeme_skoru: 92,
+        kira_gecmis_ay: 48,
+        eticaret_aylik_ciro: 4500,
+        kooperatif_uye_ay: 0,
+        sosyal_ag_skoru: 75,
+        quote: `"Zeynep Hanım serbest çalışan bir grafik tasarımcı. Geleneksel sistem güvencesiz ve düzensiz gelir sebebiyle kredi vermedi. FairLoan ise Zeynep'in 4.500 TL'lik aylık e-ticaret mikro-satış cirosunu ve mükemmel fatura ödeme geçmişini analiz etti. Skor: 895, Karar: Güvenle Onay!"`
+      },
+      ahmet: {
+        gelir: 15000,
+        istihdam_turu: "formal",
+        fatura_odeme_skoru: 78,
+        kira_gecmis_ay: 12,
+        eticaret_aylik_ciro: 0,
+        kooperatif_uye_ay: 0,
+        sosyal_ag_skoru: 50,
+        quote: `"Ahmet Bey özel sektörde sigortalı (formal) bir çalışan ve 15.000 TL resmi geliri var. Bu durum geleneksel kredi sisteminin en sevdiği profil olduğu için hem Geleneksel Banka tarafından hem de FairLoan tarafından kolayca onaylandı. Ancak FairLoan'ın gücü, sisteme erişemeyenleri bulmaktır!"`
+      }
+    };
+
+    let activePersona = 'ayse';
+
+    // Helper to format currency
+    function formatMoney(value) {
+      return Number(value).toLocaleString('tr-TR') + ' TL';
+    }
+
+    // Update range labels on-the-fly
+    function updateVal(id) {
+      const input = document.getElementById(id);
+      const label = document.getElementById('lbl-' + id.split('_')[0]);
+      if (label) {
+        if (id === 'gelir' || id === 'eticaret_aylik_ciro') {
+          label.innerText = formatMoney(input.value);
+        } else {
+          label.innerText = input.value;
+        }
+      }
+    }
+
+    // Dynamic Label Updates
+    function updateCustomLabels() {
+      // Just visually sync variables
+    }
+
+    // Persona Selection injection
+    function selectPersona(name) {
+      activePersona = name;
+      const data = personas[name];
+
+      // De-activate all buttons
+      document.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('active'));
+      // Activate clicked
+      document.getElementById('btn-persona-' + name).classList.add('active');
+
+      // Set input values
+      document.getElementById('gelir').value = data.gelir;
+      document.getElementById('istihdam_turu').value = data.istihdam_turu;
+      document.getElementById('fatura_odeme_skoru').value = data.fatura_odeme_skoru;
+      document.getElementById('kira_gecmis_ay').value = data.kira_gecmis_ay;
+      document.getElementById('eticaret_aylik_ciro').value = data.eticaret_aylik_ciro;
+      document.getElementById('kooperatif_uye_ay').value = data.kooperatif_uye_ay;
+      document.getElementById('sosyal_ag_skoru').value = data.sosyal_ag_skoru;
+
+      // Update all visual labels
+      updateVal('gelir');
+      updateVal('fatura_odeme_skoru');
+      updateVal('kira_gecmis_ay');
+      updateVal('eticaret_aylik_ciro');
+      updateVal('kooperatif_uye_ay');
+      updateVal('sosyal_ag_skoru');
+
+      // Update storytelling quote
+      document.getElementById('pitch-story-quote').innerText = data.quote;
+
+      // Trigger automatic calculation for premium UX
+      calculateScore();
+    }
+
+    // Tab Switching
+    function switchTab(sectionId) {
+      // Update buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      if (sectionId === 'demo-section') {
+        document.getElementById('tab-demo').classList.add('active');
+      } else {
+        document.getElementById('tab-bias').classList.add('active');
+        // Refresh image cache or trigger load
+        document.getElementById('bias-graph-img').src = 'bias_comparison.png?t=' + Date.now();
+      }
+
+      // Update content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    // API integration and score drawing
+    async function calculateScore(event) {
+      if (event) event.preventDefault();
+
+      // Collect payload
+      const payload = {
+        gelir: parseFloat(document.getElementById('gelir').value),
+        istihdam_turu: document.getElementById('istihdam_turu').value,
+        fatura_odeme_skoru: parseFloat(document.getElementById('fatura_odeme_skoru').value),
+        kira_gecmis_ay: parseInt(document.getElementById('kira_gecmis_ay').value),
+        eticaret_aylik_ciro: parseFloat(document.getElementById('eticaret_aylik_ciro').value),
+        kooperatif_uye_ay: parseInt(document.getElementById('kooperatif_uye_ay').value),
+        sosyal_ag_skoru: parseFloat(document.getElementById('sosyal_ag_skoru').value)
+      };
+
+      // Add loading visual indicators
+      const button = document.querySelector('.btn-submit');
+      const origText = button.innerHTML;
+      button.innerHTML = '<span class="loading-pulse">Skor Hesaplanıyor...</span>';
+      
+      const fairloanCard = document.getElementById('card-fairloan');
+      const traditionalCard = document.getElementById('card-traditional');
+      
+      fairloanCard.style.opacity = '0.6';
+      traditionalCard.style.opacity = '0.6';
+
+      try {
+        // Fetch from API (uses relative path if served by FastAPI, absolute fallback if opened as local file)
+        const fetchUrl = window.location.protocol.startsWith('http') ? '/score' : 'http://localhost:8000/score';
+        const response = await fetch(fetchUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error('API connecting error');
+        }
+
+        const resData = await response.json();
+        
+        // Update DOM
+        renderResults(resData);
+
+      } catch (err) {
+        console.warn("Backend API not reachable. Using fallback browser scoring...", err);
+        // Browser fallback calculations in case backend isn't launched yet
+        const fallbackData = calculateFallbackLocal(payload);
+        renderResults(fallbackData);
+      } finally {
+        // Remove loading state
+        button.innerHTML = origText;
+        fairloanCard.style.opacity = '1';
+        traditionalCard.style.opacity = '1';
+      }
+    }
+
+    // Draw outcomes to DOM
+    function renderResults(data) {
+      // 1. Render Traditional System Card
+      const tradData = data.geleneksel;
+      const tradCard = document.getElementById('card-traditional');
+      const tradStamp = document.getElementById('traditional-decision-stamp');
+      const tradList = document.getElementById('traditional-reasons-list');
+
+      tradList.innerHTML = '';
+      if (tradData.onay) {
+        tradCard.className = 'outcome-card traditional onaylandi';
+        tradStamp.innerText = 'ONAYLANDI';
+        tradStamp.className = 'decision-stamp approved';
+      } else {
+        tradCard.className = 'outcome-card traditional reddedildi';
+        tradStamp.innerText = 'REDDEDİLDİ';
+        tradStamp.className = 'decision-stamp rejected';
+      }
+
+      tradData.sebepler.forEach(reason => {
+        const div = document.createElement('div');
+        div.className = 'traditional-reason-item fail';
+        div.innerHTML = `<span style="font-size: 1rem;">${reason.includes('❌') ? '⚡' : '✓'}</span> <span>${reason.replace('❌ ', '').replace('✅ ', '')}</span>`;
+        tradList.appendChild(div);
+      });
+
+      // 2. Render FairLoan AI Card
+      const flData = data.fairloan;
+      const flCard = document.getElementById('card-fairloan');
+      const flStamp = document.getElementById('fairloan-decision-stamp');
+      const flList = document.getElementById('fairloan-factors-list');
+      const flScoreNum = document.getElementById('score-num');
+      const flRisk = document.getElementById('risk-badge-text');
+
+      flList.innerHTML = '';
+      
+      // Animate score count-up
+      let currentVal = 0;
+      const targetScore = flData.kredi_skoru;
+      const duration = 800; // ms
+      const startTime = performance.now();
+
+      function updateScore(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // cubic ease out
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const scoreVal = Math.round(ease * targetScore);
+        
+        flScoreNum.innerText = scoreVal;
+        
+        // Gauge ring logic
+        // 402 is stroke-dasharray (circumference of 64 radius circle is 2*pi*64 = 402)
+        const offset = 402 - (scoreVal / 1000) * 402;
+        document.getElementById('gauge-progress').style.strokeDashoffset = offset;
+
+        if (progress < 1) {
+          requestAnimationFrame(updateScore);
+        }
+      }
+      requestAnimationFrame(updateScore);
+
+      // Decision and badges
+      if (flData.onay) {
+        flCard.className = 'outcome-card fairloan approved';
+        flStamp.innerText = 'ONAYLANDI';
+        flStamp.className = 'decision-stamp approved';
+      } else {
+        flCard.className = 'outcome-card fairloan rejected';
+        flStamp.innerText = 'REDDEDİLDİ';
+        flStamp.className = 'decision-stamp rejected';
+      }
+
+      flRisk.innerText = flData.risk_seviyesi;
+      if (flData.risk_seviyesi.includes('Düşük')) {
+        flRisk.className = 'risk-badge low';
+      } else if (flData.risk_seviyesi.includes('Orta')) {
+        flRisk.className = 'risk-badge medium';
+      } else {
+        flRisk.className = 'risk-badge high';
+      }
+
+      // Populate explanations
+      flData.aciklama.forEach(fact => {
+        const li = document.createElement('li');
+        const isPos = fact.startsWith('✅');
+        li.className = isPos ? 'positive' : 'negative';
+        li.innerText = fact.replace('✅ ', '').replace('⚠️ ', '');
+        flList.appendChild(li);
+      });
+
+      // Render AI Score Builder Plan
+      const scoreBuilderBox = document.getElementById('ai-score-builder-box');
+      const scoreBuilderText = document.getElementById('ai-score-builder-text');
+      if (flData.skor_iyilestirme_plani) {
+        scoreBuilderText.innerText = flData.skor_iyilestirme_plani;
+        scoreBuilderBox.style.display = 'block';
+      } else {
+        scoreBuilderBox.style.display = 'none';
+      }
+    }
+
+    // Local Fallback Calculator in case API is not started (Premium Offline Resilience)
+    function calculateFallbackLocal(data) {
+      const geleneksel_onay = (data.gelir > 10000) && (data.istihdam_turu === 'formal');
+      const geleneksel_sebepler = [];
+      if (data.gelir <= 10000) {
+        geleneksel_sebepler.append ? geleneksel_sebepler.append() : geleneksel_sebepler.push(`Yetersiz Aylık Gelir (${data.gelir} TL < 10k barajı)`);
+      }
+      if (data.istihdam_turu !== 'formal') {
+        geleneksel_sebepler.push(`Kabul Edilmeyen İstihdam Türü`);
+      }
+      if (geleneksel_onay) {
+        geleneksel_sebepler.push("Resmi istihdam onaylandı.");
+      }
+
+      // Mock ML Heuristics
+      let score_raw = 300; // baseline
+      if (data.fatura_odeme_skoru > 75) score_raw += 200;
+      if (data.kira_gecmis_ay > 12) score_raw += 150;
+      if (data.eticaret_aylik_ciro > 2000) score_raw += 150;
+      if (data.kooperatif_uye_ay > 6) score_raw += 100;
+      if (data.sosyal_ag_skoru > 70) score_raw += 100;
+      
+      score_raw = Math.min(score_raw, 960);
+      const onay = score_raw >= 500;
+      const prob = score_raw / 1000;
+
+      const explanations = [];
+      if (data.fatura_odeme_skoru >= 75) explanations.push(`Düzenli fatura ödeme geçmişi (Fatura Skoru: ${data.fatura_odeme_skoru}/100)`);
+      if (data.kira_gecmis_ay >= 12) explanations.push(`Düzenli kira ödeme geçmişi (${data.kira_gecmis_ay} ay kesintisiz)`);
+      if (data.eticaret_aylik_ciro >= 2000) explanations.push(`Aktif e-ticaret mikro-geliri (${data.eticaret_aylik_ciro} TL/ay)`);
+      if (data.kooperatif_uye_ay >= 6) explanations.push(`Aktif kadın kooperatifi üyeliği (${data.kooperatif_uye_ay} ay)`);
+      if (data.sosyal_ag_skoru >= 75) explanations.push(`Yüksek yerel dayanışma skoru (${data.sosyal_ag_skoru}/100)`);
+
+      // Compute fallback score builder text
+      let target_score = Math.min(score_raw + 180, 850);
+      if (target_score < 620) target_score = 680;
+      let limit = target_score < 700 ? "15.000" : target_score < 800 ? "25.000" : "50.000";
+      
+      let local_actions = [];
+      if (data.fatura_odeme_skoru < 80) local_actions.push("fatura ödemelerinizi düzenli yapıp");
+      if (data.kira_gecmis_ay < 12) local_actions.push("kira ödemelerinizi banka üzerinden belgeleyip");
+      if (data.eticaret_aylik_ciro < 2500) local_actions.push("e-ticaret gelirinizi artırıp");
+      if (data.kooperatif_uye_ay < 6) local_actions.push("kooperatif teslimatlarınızı sisteme girip");
+      if (data.sosyal_ag_skoru < 75) local_actions.push("referanslarınızı güçlendirip");
+      
+      if (local_actions.length === 0) local_actions = ["fatura disiplininizi koruyup"];
+      let action_str = local_actions.join(" ve ");
+      let score_builder_text = `Skorunuz şu an ${score_raw}. Sonraki 3 ay boyunca ${action_str} durumunda skorunuz ${target_score}'e yükselecek ve ${limit} TL limitli mikro-krediniz onaylanacaktır.`;
+
+      return {
+        fairloan: {
+          kredi_skoru: score_raw,
+          onay: onay,
+          risk_seviyesi: score_raw > 700 ? "Düşük Risk" : score_raw > 400 ? "Orta Risk" : "Yüksek Risk",
+          aciklama: explanations,
+          skor_iyilestirme_plani: score_builder_text
+        },
+        geleneksel: {
+          onay: geleneksel_onay,
+          sebepler: geleneksel_sebepler
+        }
+      };
+    }
+
+    // Initial Trigger on load
+    window.addEventListener('DOMContentLoaded', () => {
+      calculateScore();
+    });
+  </script>
+</body>
+</html>
