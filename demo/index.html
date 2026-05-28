@@ -909,6 +909,46 @@
             <!-- (Storytelling quote removed to focus on manual simulation) -->
 
           </div>
+
+          <!-- DYNAMIC MACRO CALIBRATION CARD (TÜİK & BDDK) -->
+          <div id="calibration-card" class="glass-card" style="grid-column: span 2; margin-top: 1rem; display: none; animation: fadeIn 0.6s ease; border: 1px solid rgba(6, 182, 212, 0.15); background: radial-gradient(circle at 0% 0%, rgba(6, 182, 212, 0.05) 0%, transparent 50%), rgba(30, 41, 59, 0.5);">
+            <h3 class="section-title" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>📊 Makro-Ekonomik Kalibrasyon Raporu (TÜİK & BDDK & TBB)</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+              <div>
+                <h4 style="font-size: 0.9rem; color: var(--primary); margin-bottom: 0.6rem; font-family: 'Outfit'; font-weight: 600;">TÜİK Hanehalkı & İstihdam Kalibrasyonu</h4>
+                <ul style="list-style: none; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.75rem; color: var(--text-muted); padding-left: 0;">
+                  <li style="display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.45;">
+                    <span style="color: var(--primary); font-weight: bold;">•</span> 
+                    <span id="cal-gelir-text"></span>
+                  </li>
+                  <li style="display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.45;">
+                    <span style="color: var(--primary); font-weight: bold;">•</span> 
+                    <span id="cal-istihdam-text"></span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="font-size: 0.9rem; color: var(--success); margin-bottom: 0.6rem; font-family: 'Outfit'; font-weight: 600;">BDDK & TBB Finansal Erişim Kalibrasyonu</h4>
+                <ul style="list-style: none; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.75rem; color: var(--text-muted); padding-left: 0;">
+                  <li style="display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.45;">
+                    <span style="color: var(--success); font-weight: bold;">•</span> 
+                    <span id="cal-fatura-text"></span>
+                  </li>
+                  <li style="display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.45;">
+                    <span style="color: var(--success); font-weight: bold;">•</span> 
+                    <span id="cal-ciro-text"></span>
+                  </li>
+                  <li style="display: flex; gap: 0.5rem; align-items: flex-start; line-height: 1.45;">
+                    <span style="color: var(--success); font-weight: bold;">•</span> 
+                    <span id="cal-bddk-text"></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1223,6 +1263,44 @@
       } else {
         scoreBuilderBox.style.display = 'none';
       }
+
+      // Render Macro Calibration Card
+      const calCard = document.getElementById('calibration-card');
+      const calGelir = document.getElementById('cal-gelir-text');
+      const calIstihdam = document.getElementById('cal-istihdam-text');
+      const calFatura = document.getElementById('cal-fatura-text');
+      const calCiro = document.getElementById('cal-ciro-text');
+      const calBddk = document.getElementById('cal-bddk-text');
+
+      if (flData.kalibrasyon) {
+        const cal = flData.kalibrasyon;
+        const userGelir = parseFloat(document.getElementById('gelir').value);
+        
+        // Income comparison text
+        const gelirStatus = cal.gelir_vs_avg >= 0 ? `TÜİK ortalama hanehalkı kadın gelirinin <strong>%${cal.gelir_vs_avg} üzerinde</strong>` : `TÜİK ortalama hanehalkı kadın gelirinin <strong>%${Math.abs(cal.gelir_vs_avg)} altında</strong>`;
+        calGelir.innerHTML = `Girdiğiniz gelir (${formatMoney(userGelir)}), ${gelirStatus} yer almaktadır.`;
+
+        // Employment stat
+        calIstihdam.innerHTML = cal.istihdam_stat;
+
+        // Bill payment stat
+        calFatura.innerHTML = `Fatura ödeme skorunuz, TBB Risk Merkezi Türkiye ortalamasının (74/100) <strong>${cal.fatura_diff} puan ${cal.fatura_vs_avg}</strong> olarak ölçülmüştür.`;
+
+        // E-commerce revenue stat
+        if (cal.ciro_vs_avg === -100) {
+          calCiro.innerHTML = "Aktif e-ticaret kaydı/satış cirosu bulunamadı. Geleneksel sistem bu ekonomik potansiyeli tamamen yok saymaktadır.";
+        } else {
+          const ciroStatus = cal.ciro_vs_avg >= 0 ? `<strong>%${cal.ciro_vs_avg} üzerinde</strong>` : `<strong>%${Math.abs(cal.ciro_vs_avg)} altında</strong>`;
+          calCiro.innerHTML = `E-Ticaret cironuz, KOSGEB kadın girişimci veritabanındaki ortalama cironun (3.500 TL/Ay) ${ciroStatus} seyretmektedir.`;
+        }
+
+        // BDDK gender stat
+        calBddk.innerHTML = cal.bddk_stat;
+
+        calCard.style.display = 'block';
+      } else {
+        calCard.style.display = 'none';
+      }
     }
 
     // Local Fallback Calculator in case API is not started (Premium Offline Resilience)
@@ -1274,13 +1352,33 @@
       let action_str = local_actions.join(" ve ");
       let score_builder_text = `Skorunuz şu an ${score_raw}. Sonraki 3 ay boyunca ${action_str} durumunda skorunuz ${target_score}'e yükselecek ve ${limit} TL limitli mikro-krediniz onaylanacaktır.`;
 
+      // Compute fallback calibration
+      let istihdam_stat = "TÜİK Hanehalkı İşgücü Araştırması'na göre Türkiye'deki kadınların %64.9'u resmi olarak işgücüne katılamamaktadır. Ev içi el emeği üretimi finansal olarak tamamen görünmezdir.";
+      if (data.istihdam_turu === "serbest") {
+        istihdam_stat = "TÜİK verilerine göre serbest veya freelance çalışan kadınların %41.2'si güvencesiz ve kayıt dışı istihdam grubundadır, bu sebeple geleneksel sistemde kredi dışı bırakılırlar.";
+      } else if (data.istihdam_turu === "kooperatif") {
+        istihdam_stat = "TBB verilerine göre kooperatif üyesi kadın üreticilerin geleneksel bankacılık kredi sistemine erişim oranı sadece %8.4 seviyesindedir.";
+      } else if (data.istihdam_turu === "formal") {
+        istihdam_stat = "TÜİK verilerine göre formal çalışan kadınların ortalama maaşı, erkek meslektaşlarına kıyasla %15.6 oranında 'cinsiyet ücret uçurumu' (Gender Pay Gap) adaletsizliğine maruz kalmaktadır.";
+      }
+      
+      let calibration_report = {
+        gelir_vs_avg: Math.round(((data.gelir / 18000) - 1) * 100),
+        istihdam_stat: istihdam_stat,
+        fatura_vs_avg: data.fatura_odeme_skoru >= 74 ? "ortalamanın üzerinde" : "ortalamanın altında",
+        fatura_diff: Math.round(Math.abs(data.fatura_odeme_skoru - 74)),
+        ciro_vs_avg: data.eticaret_aylik_ciro > 0 ? Math.round(((data.eticaret_aylik_ciro / 3500) - 1) * 100) : -100,
+        bddk_stat: "BDDK istatistiklerine göre Türkiye'de bireysel kredilerin sadece %28.4'ü kadınlara tahsis edilmektedir. Geleneksel skorlama kadın aleyhinedir."
+      };
+
       return {
         fairloan: {
           kredi_skoru: score_raw,
           onay: onay,
           risk_seviyesi: score_raw > 700 ? "Düşük Risk" : score_raw > 400 ? "Orta Risk" : "Yüksek Risk",
           aciklama: explanations,
-          skor_iyilestirme_plani: score_builder_text
+          skor_iyilestirme_plani: score_builder_text,
+          kalibrasyon: calibration_report
         },
         geleneksel: {
           onay: geleneksel_onay,
