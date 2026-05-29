@@ -1,0 +1,17 @@
+{
+  "roc_auc": 99.87,
+  "traditional": {
+    "ev_kadin\u0131_onay": 0.0,
+    "serbest_onay": 0.0,
+    "formal_onay": 91.77,
+    "disparate_impact_ev_kadin\u0131": 0.0,
+    "disparate_impact_serbest": 0.0
+  },
+  "fairloan": {
+    "ev_kadin\u0131_onay": 97.77,
+    "serbest_onay": 98.18,
+    "formal_onay": 97.16,
+    "disparate_impact_ev_kadin\u0131": 1.01,
+    "disparate_impact_serbest": 1.01
+  }
+}

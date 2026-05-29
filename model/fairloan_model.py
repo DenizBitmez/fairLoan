@@ -33,12 +33,65 @@ pipeline.fit(X_train, y_train)
 
 # Predict on whole dataset for audit
 df["tahmin"] = pipeline.predict(X)
-bias_report = df.groupby("istihdam_turu")["tahmin"].mean().to_dict()
+
+# Fairness Audit Calculations
+def audit_fairness(dataframe, prediction_col, label_col):
+    # Privileged Group (Formal)
+    privileged_mask = (dataframe["istihdam_turu"] == "formal")
+    privileged_total = privileged_mask.sum()
+    privileged_approved = dataframe[privileged_mask][prediction_col].sum()
+    privileged_rate = privileged_approved / privileged_total if privileged_total > 0 else 0.0
+
+    # Unprivileged Groups
+    unprivileged_groups = ["ev_kadinı", "serbest", "kooperatif"]
+    results = {"rates": {"formal": round(privileged_rate, 4)}, "disparate_impact": {}}
+    
+    # Calculate Disparate Impact Ratio
+    for group in unprivileged_groups:
+        mask = (dataframe["istihdam_turu"] == group)
+        total = mask.sum()
+        approved = dataframe[mask][prediction_col].sum()
+        group_rate = approved / total if total > 0 else 0.0
+        results["rates"][group] = round(group_rate, 4)
+        
+        # Disparate Impact Ratio = Group Rate / Privileged Rate
+        dir_val = group_rate / privileged_rate if privileged_rate > 0 else 0.0
+        results["disparate_impact"][group] = round(min(dir_val, 5.0), 4)
+
+    return results
+
+# Audit both Traditional rules and FairLoan ML model
+trad_audit = audit_fairness(df, "geleneksel_onay", "geleneksel_onay")
+fair_audit = audit_fairness(df, "tahmin", "fairloan_onay")
 
 # Print results
-roc_auc = roc_auc_score(y_test, pipeline.predict_proba(X_test)[:,1])
+roc_auc = float(roc_auc_score(y_test, pipeline.predict_proba(X_test)[:,1]))
 print(f"ROC-AUC: {roc_auc:.4f}")
-print("Bias Report:", json.dumps(bias_report, indent=2))
+print("Traditional Fairness Audit:", json.dumps(trad_audit, indent=2))
+print("FairLoan Fairness Audit:", json.dumps(fair_audit, indent=2))
+
+# Export fairness metrics to JSON for API delivery
+fairness_metrics_export = {
+    "roc_auc": round(roc_auc * 100, 2),
+    "traditional": {
+        "ev_kadinı_onay": round(trad_audit["rates"]["ev_kadinı"] * 100, 2),
+        "serbest_onay": round(trad_audit["rates"]["serbest"] * 100, 2),
+        "formal_onay": round(trad_audit["rates"]["formal"] * 100, 2),
+        "disparate_impact_ev_kadinı": round(trad_audit["disparate_impact"]["ev_kadinı"], 2),
+        "disparate_impact_serbest": round(trad_audit["disparate_impact"]["serbest"], 2)
+    },
+    "fairloan": {
+        "ev_kadinı_onay": round(fair_audit["rates"]["ev_kadinı"] * 100, 2),
+        "serbest_onay": round(fair_audit["rates"]["serbest"] * 100, 2),
+        "formal_onay": round(fair_audit["rates"]["formal"] * 100, 2),
+        "disparate_impact_ev_kadinı": round(fair_audit["disparate_impact"]["ev_kadinı"], 2),
+        "disparate_impact_serbest": round(fair_audit["disparate_impact"]["serbest"], 2)
+    }
+}
+
+with open("model/fairness_metrics.json", "w", encoding="utf-8") as f:
+    json.dump(fairness_metrics_export, f, indent=2)
+print("Fairness metrics saved successfully to 'model/fairness_metrics.json'.")
 
 # Save the trained model pipeline
 joblib.dump(pipeline, "model/fairloan_pipeline.pkl")
