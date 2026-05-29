@@ -84,23 +84,6 @@ Sunucu aktifken tarayıcınızda [http://127.0.0.1:8000](http://127.0.0.1:8000) 
 
 ---
 
-## Jüri Sunumu & Pitch Anlatısı Rehberi (Sunum İpuçları)
-
-Jüri önünde sunum yaparken şu hikayeleştirme adımlarını takip etmeniz başarı oranınızı zirveye taşıyacaktır:
-
-1. **Giriş (Bariyeri Gösterin):** 
-   - Arayüzden **Ayşe Hanım**'ın kartına tıklayın. Slider'lar hareket ederken jüriye şunu söyleyin: *"Geleneksel bankacılık, Ayşe Hanım'ın resmi istihdamı ve bordrosu olmadığı için onu doğrudan 'Görünmez' kabul etti ve Borç/Gelir (DTI) oranını dahi hesaplamadan anında REDDETTİ."*
-2. **ML ve Alternatif Veri Devrimi:** 
-   - FairLoan kartına odaklanın: *"Ancak FairLoan, Açık Bankacılık Sandbox API geçidimizle Ayşe Hanım'ın rızasını alarak fatura ödemelerini, 3 yıllık düzenli kirasını ve kadın kooperatifindeki üretim emeklerini doğruladı. Ona 840 FairLoan skoru verdi ve kredisini ONAYLADI."*
-3. **Kademeli Güven Merdiveni:**
-   - Stepper alanını gösterin: *"Riski sıfırlamak için Ayşe Hanım'a limiti tek seferde vermiyoruz. 4 aşamalı Güven Merdivenimizle ilk 3 ay %20 limit verip ödemelerini denetliyoruz."*
-4. **Müşteri Kazanım Hunisi:**
-   - Halkbank Kurumsal Geçiş alanını gösterin: *"Ayşe Hanım güven merdivenini başarıyla tırmandığında platformumuz ona otomatik olarak **Halkbank Paraf Üreten Kadın Kartı** ve **Halkbank Esnaf Kredisi** teklif ederek onu bankamızın ömür boyu sadık bir ticari müşterisine dönüştürüyor!"*
-5. **Raporu İndirme & Islak İmza Kapanışı:**
-   - **"Finansal Sağlık Raporunu İndir"** butonuna basın: *"Bankacılık standartlarına tam uyum için tüm bu adalet analizi, cryptographic bütünlük imzaları ve DTI karşılaştırmaları tek tıkla şube yöneticimizin eline ıslak imzaya hazır resmi bir PDF rapor olarak dökülmektedir."*
-
----
-
 ## Teknolojiler & Kütüphaneler
 
 * **Veri & Analitik:** Pandas, NumPy, Matplotlib
